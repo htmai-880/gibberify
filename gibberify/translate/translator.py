@@ -11,7 +11,7 @@ class Translator:
     """
     executes translations according to current configuration and inputs
     """
-    def __init__(self, lang_in=None, lang_out=None, text_in='', dicts=None):
+    def __init__(self, lang_in=None, lang_out=None, text_in='', dicts=None, seed=None):
         """
         :param lang_in: language to translate from
         :param lang_out: language to transate to
@@ -24,6 +24,8 @@ class Translator:
         self.text_out = ''
         self.dicts = self.load_dicts(dicts)
         self.dict = None
+        # seed for deterministic translations
+        self.seed = seed
 
     def __str__(self):
         # make sure translation is performed at least once before returning
@@ -68,7 +70,7 @@ class Translator:
 
         return dicts
 
-    def gibberify(self):
+    def gibberify(self, seed=None):
         """
         translate a text from real language into a specified gibberish language
 
@@ -85,6 +87,9 @@ class Translator:
             if re.match(r'\w+', w):
                 syl = utils.syllabize(w)
                 # translate syllables only if they are found, otherwise return a random one
+                # If a seed exists, use it to generate a deterministic translation
+                if not seed is None:
+                    random.seed(seed)
                 trans_syl = [self.dict.get(s.lower(), random.choice(list(self.dict)))
                              for s in syl]
                 # save word translation
@@ -163,6 +168,6 @@ class Translator:
 
         # check if current translator is straight or reverse
         if not self.dict.reverse:
-            self.text_out = self.gibberify()
+            self.text_out = self.gibberify(seed=self.seed)
         else:
             self.text_out = self.degibberify()
