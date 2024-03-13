@@ -2,5 +2,5 @@ pyphen
 transliterate
 PyQt5
 certifi
-text-editor
+texteditor
 packaging
